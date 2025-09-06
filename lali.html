@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Boo Boo's lullaby</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://tse2.mm.bing.net/th/id/OIP.apyqBi6V6uQlrAc-mfWLOQHaHa?rs=1&pid=ImgDetMain&o=7&rm=3') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      margin: 30px 20px 10px;
+      font-size: 2em;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .player-container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    select, button {
+      margin: 8px 4px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover, select:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    #loopDisplay {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 15px 0 10px;
+      text-shadow: 1px 1px 3px black;
+    }
+
+    .progress-bar {
+      width: 100%;
+      appearance: none;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      outline: none;
+      background-image: linear-gradient(#00ffd5, #00ffd5);
+      background-repeat: no-repeat;
+      background-size: 0% 100%;
+      margin: 5px 0 15px;
+    }
+
+    .progress-bar::-webkit-slider-thumb {
+      appearance: none;
+      height: 14px;
+      width: 14px;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+      border: 1px solid #aaa;
+      margin-top: -5px;
+    }
+
+    .main-controls {
+      margin-top: 10px;
+    }
+
+    #playPauseBtn {
+      font-size: 24px;
+      background: white;
+      color: black;
+      padding: 15px;
+      border-radius: 50%;
+      border: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+    }
+
+    footer {
+      font-style: italic;
+      font-size: 20px;
+      color: #f0f0f0;
+      margin: 25px 0;
+      text-shadow: 1px 1px 3px black;
+    }
+
+    footer i {
+      color: #ff5e7e;
+    }
+  </style>
+</head>
+<body>
+  <div class="player-container">
+    <h1><i class="fas fa-baby-carriage"></i> Boo Boo's lullaby</h1>
+
+    <audio id="rainAudio">
+      <source src="/lali.mp3" type="audio/mpeg" />
+    </audio>
+
+    <select id="loopSelect">
+      <option value="1">1 Loop</option>
+      <option value="2">2 Loops</option>
+      <option value="3">3 Loops</option>
+      <option value="4">4 Loops</option>
+      <option value="5">5 Loops</option>
+    </select>
+    <button onclick="stopAudio()"><i class="fas fa-stop"></i> Stop</button>
+
+    <div id="loopDisplay">Remaining Loops: --</div>
+
+    <input type="range" id="progress" class="progress-bar" value="0" min="0" max="100" />
+
+    <div class="main-controls">
+      <button id="playPauseBtn" onclick="togglePlayPause()">
+        <i id="playPauseIcon" class="fas fa-play"></i>
+      </button>
+    </div>
+  </div>
+
+  <footer>Made with <i class="fas fa-heart"></i> by Hemashree</footer>
+
+  <script>
+    const audio = document.getElementById("rainAudio");
+    const playIcon = document.getElementById("playPauseIcon");
+    const progress = document.getElementById("progress");
+    const loopDisplay = document.getElementById("loopDisplay");
+    const loopSelect = document.getElementById("loopSelect");
+
+    let isPlaying = false;
+    let isPaused = false;
+    let totalLoops = 0;
+    let remainingLoops = 0;
+
+    function togglePlayPause() {
+      if (isPlaying) {
+        pauseAudio();
+      } else {
+        startAudio();
+      }
+    }
+
+    function startAudio() {
+      if (isPaused) {
+        resumeAudio();
+      } else {
+        totalLoops = parseInt(loopSelect.value);
+        remainingLoops = totalLoops;
+        updateLoopDisplay();
+        audio.currentTime = 0;
+        audio.play();
+        isPlaying = true;
+      }
+      playIcon.className = "fas fa-pause";
+    }
+
+    function pauseAudio() {
+      isPaused = true;
+      isPlaying = false;
+      audio.pause();
+      playIcon.className = "fas fa-play";
+    }
+
+    function stopAudio() {
+      audio.pause();
+      audio.currentTime = 0;
+      isPlaying = false;
+      isPaused = false;
+      remainingLoops = 0;
+      updateLoopDisplay();
+      progress.value = 0;
+      playIcon.className = "fas fa-play";
+    }
+
+    function resumeAudio() {
+      audio.play();
+      isPlaying = true;
+      playIcon.className = "fas fa-pause";
+    }
+
+    function updateLoopDisplay() {
+      loopDisplay.innerText = `Remaining Loops: ${remainingLoops > 0 ? remainingLoops : "--"}`;
+    }
+
+    function updateProgress() {
+      const value = (audio.currentTime / audio.duration) * 100;
+      progress.value = value || 0;
+      progress.style.backgroundSize = `${progress.value}% 100%`;
+    }
+
+    progress.addEventListener("input", () => {
+      audio.currentTime = (progress.value / 100) * audio.duration;
+    });
+
+    audio.addEventListener("timeupdate", updateProgress);
+
+    // Handle loop counting
+    audio.addEventListener("ended", () => {
+      remainingLoops--;
+      if (remainingLoops > 0) {
+        updateLoopDisplay();
+        audio.currentTime = 0;
+        audio.play();
+      } else {
+        stopAudio();
+      }
+    });
+  </script>
+</body>
+</html>
